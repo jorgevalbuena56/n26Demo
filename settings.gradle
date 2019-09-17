@@ -1,0 +1,2 @@
+include ':app', ':cache', ':data', ':remote'
+rootProject.name='N26Demo'

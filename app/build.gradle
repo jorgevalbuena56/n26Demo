@@ -1,0 +1,109 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    def globalConfiguration = rootProject.extensions.getByName("ext")
+
+    dataBinding {
+        enabled = true
+    }
+
+    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
+
+    defaultConfig {
+        minSdkVersion globalConfiguration["androidMinSdkVersion"]
+        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
+        testInstrumentationRunner "com.n26.n26demo.test.TestRunner"
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+
+    lintOptions {
+        quiet true
+        abortOnError false
+        ignoreWarnings true
+    }
+
+}
+
+dependencies {
+    def appDependencies = rootProject.ext.appDependencies
+    def appTestDependencies = rootProject.ext.appTestDependencies
+
+    implementation project(':data')
+    implementation project(':cache')
+    implementation project(':remote')
+
+    kapt appDependencies.daggerCompiler
+    implementation appDependencies.dagger
+    implementation appDependencies.jsr
+    implementation appDependencies.kotlin
+    implementation appDependencies.rxKotlin
+    implementation appDependencies.androidAnnotations
+    implementation appDependencies.appCompatV7
+    implementation appDependencies.supportDesign
+    implementation appDependencies.constraintLayout
+    implementation appDependencies.rxAndroid
+    implementation appDependencies.mpAndroidChart
+    implementation appDependencies.gson
+    //annotationProcessor "android.arch.lifecycle:compiler:1.1.1" // use kapt for Kotlin
+    // alternately - if using Java8, use the following instead of compiler
+    implementation appDependencies.commonJava
+
+    implementation presentationDependencies.archExtensions
+    implementation appDependencies.roomRxJava
+
+    implementation appTestDependencies.espressoIdlingResource
+    implementation "androidx.test:core:1.2.1-alpha02"
+
+    testImplementation appTestDependencies.kotlinJUnit
+    androidTestImplementation "android.arch.core:core-testing:1.1.1"
+
+    testImplementation appTestDependencies.mockito
+
+    // Instrumentation test dependencies
+    androidTestImplementation appTestDependencies.junit
+    androidTestImplementation (appTestDependencies.mockito, {
+        exclude group: 'org.jetbrains.kotlin'
+        exclude group: 'org.mockito'
+    })
+    androidTestImplementation appTestDependencies.mockitoAndroid
+    androidTestImplementation (appTestDependencies.espressoCore) {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+//    androidTestImplementation (appTestDependencies.androidRunner) {
+//        exclude group: 'com.android.support', module: 'support-annotations'
+//    }
+//    androidTestImplementation (appTestDependencies.androidRules) {
+//        exclude group: 'com.android.support', module: 'support-annotations'
+//    }
+    androidTestImplementation (appTestDependencies.espressoIntents) {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestImplementation(appTestDependencies.espressoContrib) {
+        exclude module: 'appcompat'
+        exclude module: 'appcompat-v7'
+        exclude module: 'support-v4'
+        exclude module: 'support-v13'
+        exclude module: 'support-annotations'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'design'
+    }
+}
